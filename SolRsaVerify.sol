@@ -15,6 +15,11 @@ pragma solidity ^0.4.15;
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    
+    Checked results with FIPS test vectors
+    https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/dss/186-3rsatestvectors.zip
+    file SigVer15_186-3.rsp
+    
  */
 
 contract SolRsaVerify {
