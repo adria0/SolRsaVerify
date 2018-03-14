@@ -22,7 +22,7 @@ pragma solidity ^0.4.19;
     
  */
 
-contract SolRsaVerify {
+library SolRsaVerify {
 
     function memcpy(uint _dest, uint _src, uint _len) pure internal {
         // Copy word-length chunks while possible
