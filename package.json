@@ -1,0 +1,30 @@
+{
+  "name": "solrsaverify",
+  "version": "1.0.0",
+  "description": "RSA256 PKCS1.5 Verification for solidity",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "truffle": "^4.1.3"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adriamb/SolRsaVerify.git"
+  },
+  "keywords": [
+    "rsa",
+    "solidity",
+    "crypto",
+    "pkcs1.5"
+  ],
+  "author": "Adria Massanet",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adriamb/SolRsaVerify/issues"
+  },
+  "homepage": "https://github.com/adriamb/SolRsaVerify#readme"
+}
