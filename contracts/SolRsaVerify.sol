@@ -136,7 +136,7 @@ library SolRsaVerify {
     }
 
     /** @dev Verifies a PKCSv1.5 SHA256 signature
-      * @param _data 
+      * @param _data to verify
       * @param _s is the signature
       * @param _e is the exponent
       * @param _m is the modulus
