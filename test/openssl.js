@@ -44,7 +44,7 @@ contract("SolRsaVerify-openssl", (accounts) => {
         > openssl asn1parse -inform TXT -i -in public.pem -strparse 18
             0:d=0  hl=3 l= 137 cons: SEQUENCE
             3:d=1  hl=3 l= 129 prim:  INTEGER           :DF3EDDE009B96BC5B03B48BD73FE70A3AD20EAF624D0DC1BA121A45CC739893741B7CF82ACF1C91573EC8266538997C6699760148DE57E54983191ECA0176F518E547B85FE0BB7D9E150DF19EEE734CF5338219C7F8F7B13B39F5384179F62C135E544CB70BE7505751F34568E06981095AEEC4F3A887639718A3E11D48C240D
-        135:d=1  hl=2 l=   3 prim:  INTEGER           :010001
+          135:d=1  hl=2 l=   3 prim:  INTEGER           :010001
         
         # get the `e`=010001 and `n` DF..0D
     */
