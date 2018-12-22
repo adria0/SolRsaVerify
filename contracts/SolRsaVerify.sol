@@ -1,4 +1,4 @@
-pragma solidity ^0.4.19;
+pragma solidity ^0.5.0;
 
 /*
     Copyright 2016, Adrià Massanet
@@ -44,7 +44,9 @@ library SolRsaVerify {
     }
 
     
-    function join(bytes _s, bytes _e, bytes _m) pure internal returns (bytes) {
+    function join(
+	bytes memory _s, bytes memory _e, bytes memory _m
+    ) pure internal returns (bytes memory) {
         uint inputLen = 0x60+_s.length+_e.length+_m.length;
         
         uint slen = _s.length;
@@ -79,7 +81,10 @@ library SolRsaVerify {
       * @param _m is the modulus
       * @return 0 if success, >0 otherwise
     */    
-    function pkcs1Sha256Verify(bytes32 _sha256, bytes _s, bytes _e, bytes _m) public view returns (uint) {
+    function pkcs1Sha256Verify(
+        bytes32 _sha256,
+        bytes memory _s, bytes memory _e, bytes memory _m
+    ) public view returns (uint) {
         
         uint8[19] memory sha256Prefix = [
             0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20
@@ -95,12 +100,10 @@ library SolRsaVerify {
 
         uint decipherlen = _m.length;
         bytes memory decipher = new bytes(decipherlen);
-        bool success;
-		assembly {
-			success := staticcall(sub(gas, 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen)
-			switch success case 0 { invalid }
-		}
-
+        assembly {
+            pop(staticcall(sub(gas, 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
+	}
+        
         /// 0x00 || 0x01 || PS || 0x00 || DigestInfo
         /// PS is padding filled with 0xff
         //  DigestInfo ::= SEQUENCE {
@@ -110,7 +113,7 @@ library SolRsaVerify {
         
         uint paddingLen = decipherlen - 3 - sha256Prefix.length - 32;
         
-        if (decipher[0] != 0 || decipher[1] != 1) {
+        if (decipher[0] != 0 || uint8(decipher[1]) != 1) {
             return 1;
         }
         for (i = 2;i<2+paddingLen;i++) {
@@ -142,7 +145,10 @@ library SolRsaVerify {
       * @param _m is the modulus
       * @return 0 if success, >0 otherwise
     */    
-    function pkcs1Sha256VerifyRaw(bytes _data, bytes _s, bytes _e, bytes _m) public view returns (uint) {
+    function pkcs1Sha256VerifyRaw(
+        bytes memory _data, 
+        bytes memory _s, bytes memory _e, bytes memory _m
+    ) public view returns (uint) {
         return pkcs1Sha256Verify(sha256(_data),_s,_e,_m);
     }
 

@@ -50,19 +50,18 @@ And finally we need to extract `n` (the modulus) from the public key:
 Now we can call `SolRsaVerify.pkcs1Sha256VerifyRaw` and verify the signature:
 
 ````javascript
-const message = "hello world";
+const message = web3.utils.asciiToHex("hello world");
 const modulus = "0xB793F2F926170FAD768F8B1A5769A2243B4CDCAC4780194F59B39E1A2ABC3BB8EA42DB495D17BEC7F7072A11ED4FA510E75A7886A5DB6F71B7AFCA0090CA079889D18AF0669829ED29A8E21D0C09BD19CAAF2FE2CC8121BFC5687AC6698E3022F468A481426486CAD263BE1A119491E034A6E1AB78F19C066D4145A50F9ECFF7";
 const exponent= "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010001";
 const signature = "0x57a0d6a185924d9d579b3ab319fe512331cb0bc6ef2da7d5285cbd06844f5c44662cae2e41ee5020893d6690e34b50a369a78250ae81ba6d708560535ef7cff0299f2ba070b096a9a76e84cf9c902b5e367b341ee166f5fc325dd08a3d971d96d528937f617a1eaf2250c56c4edca80c65970d54fe2492a19468bd32166b3c32";
 
-contract = await SolRsaVerify.new();
-const result = contract.pkcs1Sha256VerifyRaw(message, signature, exponent, modulus);
-if(result == 0) {
+const contract = await SolRsaVerify.new();
+const result = await contract.pkcs1Sha256VerifyRaw(message, signature, exponent, modulus);
+if (result == 0) {
   console.log("Signature is valid");
 } else {
   console.log("Signature is invalid");
 }
-# => Signature is valid
 ````
 
 (Note: don't forget to prefix the hex values with 0x)
