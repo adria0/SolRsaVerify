@@ -24,7 +24,7 @@ First you'll need an RSA private key. You can generate one using the
 Next lets sign a message:
 
 
-    $ echo "hello world" | openssl dgst -sha256 -sign private.pem -out | xxd -p | tr -d \\n
+    $ echo -n "hello world" | openssl dgst -sha256 -sign private.pem -out | xxd -p | tr -d \\n
     00d5380ea463dcb195e887bd900c2e25098401378d6da2e97e56ef1b984e6a67959f7adc662727e0c1e3ea3580caecba6a69925eec3704413e2192b0ff40f4711d424e4e1ecc6128534a2527c04bb1576c4582a589559a8ff9ad2bfd5f09f856dfefd90cd0464dee63f7b10d0b5ef69c389bc4ef4a9d35254fcad5ad246cc6a3%
 
 
