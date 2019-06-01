@@ -22,7 +22,7 @@
     "pkcs1.5"
   ],
   "author": "Adria Massanet",
-  "license": "ISC",
+  "license": "GPL3",
   "bugs": {
     "url": "https://github.com/adriamb/SolRsaVerify/issues"
   },
