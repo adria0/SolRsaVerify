@@ -1,6 +1,6 @@
 # SolRsaVerify
 
-[![Build Status](https://travis-ci.org/adriamb/SolRsaVerify.svg?branch=master)](https://travis-ci.org/adriamb/SolRsaVerify)
+[![Build Status](https://github.com/adria0/SolRsaVerify/workflows/Truffle%20CI/badge.svg)](https://github.com/adria0/SolRsaVerify/actions?query=workflow%3A%22Truffle+CI%22)
 
 Verification of RSA Sha256 Pkcs1.5 Signatures
 
