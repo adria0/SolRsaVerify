@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.6.0;
 
 /*
     Copyright 2016, Adrià Massanet
@@ -101,7 +101,7 @@ library SolRsaVerify {
         uint decipherlen = _m.length;
         bytes memory decipher = new bytes(decipherlen);
         assembly {
-            pop(staticcall(sub(gas, 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
+            pop(staticcall(sub(gas(), 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
 	}
         
         /// 0x00 || 0x01 || PS || 0x00 || DigestInfo
