@@ -1,4 +1,4 @@
-pragma solidity ^0.6.0;
+pragma solidity ^0.8.9;
 
 /*
     Copyright 2016, Adrià Massanet
@@ -35,11 +35,13 @@ library SolRsaVerify {
         }
 
         // Copy remaining bytes
-        uint mask = 256 ** (32 - _len) - 1;
-        assembly {
-            let srcpart := and(mload(_src), not(mask))
-            let destpart := and(mload(_dest), mask)
-            mstore(_dest, or(destpart, srcpart))
+        unchecked {
+            uint mask = 256 ** (32 - _len) - 1;
+            assembly {
+                let srcpart := and(mload(_src), not(mask))
+                let destpart := and(mload(_dest), mask)
+                mstore(_dest, or(destpart, srcpart))
+            }
         }
     }
 
