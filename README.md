@@ -8,7 +8,7 @@ This kind of signatures (with PSS) are standard in CryptoAPIs when generating RS
 
 Checked results with FIPS test vectors https://csrc.nist.gov/CSRC/media/Projects/Cryptographic-Algorithm-Validation-Program/documents/dss/186-2rsatestvectors.zip file SigVer15_186-3.rsp
 
-# Usage
+# Usage with OpenSSL (OpenSSL 3.1.1)
 
 First you'll need an RSA private key. You can generate one using the
 `openssl` cli:
@@ -24,7 +24,7 @@ First you'll need an RSA private key. You can generate one using the
 Next lets sign a message:
 
 
-    $ echo -n "hello world" | openssl dgst -sha256 -sign private.pem -out | xxd -p | tr -d \\n
+    $ echo -n "hello world" | openssl dgst -sha256 -sign private.pem | xxd -p | tr -d \\n
     00d5380ea463dcb195e887bd900c2e25098401378d6da2e97e56ef1b984e6a67959f7adc662727e0c1e3ea3580caecba6a69925eec3704413e2192b0ff40f4711d424e4e1ecc6128534a2527c04bb1576c4582a589559a8ff9ad2bfd5f09f856dfefd90cd0464dee63f7b10d0b5ef69c389bc4ef4a9d35254fcad5ad246cc6a3%
 
 
@@ -41,7 +41,7 @@ Now let's extract the public key from the private key:
 And finally we need to extract `n` (the modulus) from the public key:
 
 
-    $  openssl asn1parse -inform TXT -i -in public.pem -strparse 18
+    $  openssl asn1parse -inform PEM -i -in public.pem -strparse 18
     0:d=0  hl=3 l= 137 cons: SEQUENCE
     3:d=1  hl=3 l= 129 prim:  INTEGER           :B793F2F926170FAD768F8B1A5769A2243B4CDCAC4780194F59B39E1A2ABC3BB8EA42DB495D17BEC7F7072A11ED4FA510E75A7886A5DB6F71B7AFCA0090CA079889D18AF0669829ED29A8E21D0C09BD19CAAF2FE2CC8121BFC5687AC6698E3022F468A481426486CAD263BE1A119491E034A6E1AB78F19C066D4145A50F9ECFF7
     135:d=1  hl=2 l=   3 prim:  INTEGER           :010001

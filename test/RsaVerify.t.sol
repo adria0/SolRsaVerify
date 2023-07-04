@@ -245,12 +245,12 @@ contract RsaVerifyTest is Test {
         > openssl rsa -in private.pem -outform der -pubout -out public.pem
 
         # addd -n to echo to remove final carriage return
-        > echo -n "hello world" | openssl dgst -sha256 -sign private.pem -out | xxd -p | tr -d \\n
+        > echo -n "hello world" | openssl dgst -sha256 -sign private.pem | xxd -p | tr -d \\n
 
         079bed733b48d69bdb03076cb17d9809072a5a765460bc72072d687dba492afe951d75b814f561f253ee5cc0f3d703b6eab5b5df635b03a5437c0a5c179309812f5b5c97650361c645bc99f806054de21eb187bc0a704ed38d3d4c2871a117c19b6da7e9a3d808481c46b22652d15b899ad3792da5419e50ee38759560002388
 
         # extract the public n from the public key
-        > openssl asn1parse -inform TXT -i -in public.pem -strparse 18
+        > openssl asn1parse -inform DER -i -in public.pem -strparse 18
             0:d=0  hl=3 l= 137 cons: SEQUENCE
             3:d=1  hl=3 l= 129 prim:  INTEGER           :DF3EDDE009B96BC5B03B48BD73FE70A3AD20EAF624D0DC1BA121A45CC739893741B7CF82ACF1C91573EC8266538997C6699760148DE57E54983191ECA0176F518E547B85FE0BB7D9E150DF19EEE734CF5338219C7F8F7B13B39F5384179F62C135E544CB70BE7505751F34568E06981095AEEC4F3A887639718A3E11D48C240D
           135:d=1  hl=2 l=   3 prim:  INTEGER           :010001
