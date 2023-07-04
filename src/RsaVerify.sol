@@ -36,12 +36,14 @@ library RsaVerify {
         bytes memory _s, bytes memory _e, bytes memory _m
     ) public view returns (bool) {
         
-        uint8[19] memory sha256Prefix = [
-            0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00, 0x04, 0x20
+        uint8[17] memory sha256ExplicitNullParam = [
+            0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00
+        ];
+
+        uint8[15] memory sha256ImplicitNullParam = [
+            0x30,0x2f,0x30,0x0b,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01
         ];
         
-      	require(_m.length >= sha256Prefix.length+_sha256.length+11);
-
         uint i;
 
         /// decipher
@@ -58,17 +60,31 @@ library RsaVerify {
         assembly {
             pop(staticcall(sub(gas(), 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
 	    }
-        
+
         /// 0x00 || 0x01 || PS || 0x00 || DigestInfo
         /// PS is padding filled with 0xff
         //  DigestInfo ::= SEQUENCE {
         //     digestAlgorithm AlgorithmIdentifier,
+        //       [optional algorithm parameters]
         //     digest OCTET STRING
         //  }
 
-        uint paddingLen = decipherlen - 3 - sha256Prefix.length - 32;
-        
-        if (decipher[0] != 0 || uint8(decipher[1]) != 1) {
+        bool hasNullParam;
+        uint hashAlgoWithParamLen;
+
+        if (uint8(decipher[decipherlen-50])==0x31) {
+            hasNullParam = true;
+             hashAlgoWithParamLen = sha256ExplicitNullParam.length;
+        } else if  (uint8(decipher[decipherlen-48])==0x2f) {
+            hasNullParam = false;
+            hashAlgoWithParamLen = sha256ImplicitNullParam.length;
+        } else {
+            return false;
+        }
+
+        uint256 paddingLen = decipherlen - 5 - hashAlgoWithParamLen -  32 ;
+
+        if (decipher[0] != 0 || decipher[1] != 0x01) {
             return false;
         }
         for (i = 2;i<2+paddingLen;i++) {
@@ -79,13 +95,23 @@ library RsaVerify {
         if (decipher[2+paddingLen] != 0) {
             return false;
         }
-        for (i = 0;i<sha256Prefix.length;i++) {
-            if (uint8(decipher[3+paddingLen+i])!=sha256Prefix[i]) {
-                return false;
+
+        if (hashAlgoWithParamLen == sha256ExplicitNullParam.length) {
+            for (i = 0;i<hashAlgoWithParamLen;i++) {
+                if (decipher[3+paddingLen+i]!=bytes1(sha256ExplicitNullParam[i])) {
+                    return false;
+                }
+            }
+        } else {
+            for (i = 0;i<hashAlgoWithParamLen;i++) {
+                if (decipher[3+paddingLen+i]!=bytes1(sha256ImplicitNullParam[i])) {
+                    return false;
+                }
             }
         }
+
         for (i = 0;i<_sha256.length;i++) {
-            if (decipher[3+paddingLen+sha256Prefix.length+i]!=_sha256[i]) {
+            if (decipher[3+2+paddingLen+hashAlgoWithParamLen+i]!=_sha256[i]) {
                 return false;
             }
         }
