@@ -1,6 +1,6 @@
 # SolRsaVerify
 
-[![Build Status](https://github.com/adria0/SolRsaVerify/workflows/Truffle%20CI/badge.svg)](https://github.com/adria0/SolRsaVerify/actions?query=workflow%3A%22Truffle+CI%22) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![test](https://github.com/adria0/SolRsaVerify/actions/workflows/test.yml/badge.svg)](https://github.com/adria0/SolRsaVerify/actions/workflows/test.yml) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Verification of RSA Sha256 Pkcs1.5 Signatures
 
