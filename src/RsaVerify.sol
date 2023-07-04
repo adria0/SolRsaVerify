@@ -29,7 +29,7 @@ library RsaVerify {
       * @param _s is the signature
       * @param _e is the exponent
       * @param _m is the modulus
-      * @return 0 if success, >0 otherwise
+      * @return true if success, false otherwise
     */    
     function pkcs1Sha256(
         bytes32 _sha256,
@@ -44,9 +44,8 @@ library RsaVerify {
             0x30,0x2f,0x30,0x0b,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01
         ];
         
-        uint i;
+        // decipher
 
-        /// decipher
         bytes memory input = bytes.concat(
             bytes32(_s.length),
             bytes32(_e.length),
@@ -61,13 +60,15 @@ library RsaVerify {
             pop(staticcall(sub(gas(), 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
 	    }
 
-        /// 0x00 || 0x01 || PS || 0x00 || DigestInfo
-        /// PS is padding filled with 0xff
-        //  DigestInfo ::= SEQUENCE {
-        //     digestAlgorithm AlgorithmIdentifier,
-        //       [optional algorithm parameters]
-        //     digest OCTET STRING
-        //  }
+        // Check that is well encoded:
+        //
+        // 0x00 || 0x01 || PS || 0x00 || DigestInfo
+        // PS is padding filled with 0xff
+        // DigestInfo ::= SEQUENCE {
+        //    digestAlgorithm AlgorithmIdentifier,
+        //      [optional algorithm parameters]
+        //    digest OCTET STRING
+        // }
 
         bool hasNullParam;
         uint hashAlgoWithParamLen;
@@ -82,12 +83,12 @@ library RsaVerify {
             return false;
         }
 
-        uint256 paddingLen = decipherlen - 5 - hashAlgoWithParamLen -  32 ;
+        uint paddingLen = decipherlen - 5 - hashAlgoWithParamLen -  32 ;
 
         if (decipher[0] != 0 || decipher[1] != 0x01) {
             return false;
         }
-        for (i = 2;i<2+paddingLen;i++) {
+        for (uint i = 2;i<2+paddingLen;i++) {
             if (decipher[i] != 0xff) {
                 return false;
             }
@@ -97,20 +98,20 @@ library RsaVerify {
         }
 
         if (hashAlgoWithParamLen == sha256ExplicitNullParam.length) {
-            for (i = 0;i<hashAlgoWithParamLen;i++) {
+            for (uint i = 0;i<hashAlgoWithParamLen;i++) {
                 if (decipher[3+paddingLen+i]!=bytes1(sha256ExplicitNullParam[i])) {
                     return false;
                 }
             }
         } else {
-            for (i = 0;i<hashAlgoWithParamLen;i++) {
+            for (uint i = 0;i<hashAlgoWithParamLen;i++) {
                 if (decipher[3+paddingLen+i]!=bytes1(sha256ImplicitNullParam[i])) {
                     return false;
                 }
             }
         }
 
-        for (i = 0;i<_sha256.length;i++) {
+        for (uint i = 0;i<_sha256.length;i++) {
             if (decipher[3+2+paddingLen+hashAlgoWithParamLen+i]!=_sha256[i]) {
                 return false;
             }
