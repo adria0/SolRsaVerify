@@ -71,19 +71,19 @@ library RsaVerify {
         // }
 
         bool hasNullParam;
-        uint hashAlgoWithParamLen;
+        uint digestAlgoWithParamLen;
 
         if (uint8(decipher[decipherlen-50])==0x31) {
             hasNullParam = true;
-             hashAlgoWithParamLen = sha256ExplicitNullParam.length;
+             digestAlgoWithParamLen = sha256ExplicitNullParam.length;
         } else if  (uint8(decipher[decipherlen-48])==0x2f) {
             hasNullParam = false;
-            hashAlgoWithParamLen = sha256ImplicitNullParam.length;
+            digestAlgoWithParamLen = sha256ImplicitNullParam.length;
         } else {
             return false;
         }
 
-        uint paddingLen = decipherlen - 5 - hashAlgoWithParamLen -  32 ;
+        uint paddingLen = decipherlen - 5 - digestAlgoWithParamLen -  32 ;
 
         if (decipher[0] != 0 || decipher[1] != 0x01) {
             return false;
@@ -97,22 +97,31 @@ library RsaVerify {
             return false;
         }
 
-        if (hashAlgoWithParamLen == sha256ExplicitNullParam.length) {
-            for (uint i = 0;i<hashAlgoWithParamLen;i++) {
+        // check digest algorithm
+
+        if (digestAlgoWithParamLen == sha256ExplicitNullParam.length) {
+            for (uint i = 0;i<digestAlgoWithParamLen;i++) {
                 if (decipher[3+paddingLen+i]!=bytes1(sha256ExplicitNullParam[i])) {
                     return false;
                 }
             }
         } else {
-            for (uint i = 0;i<hashAlgoWithParamLen;i++) {
+            for (uint i = 0;i<digestAlgoWithParamLen;i++) {
                 if (decipher[3+paddingLen+i]!=bytes1(sha256ImplicitNullParam[i])) {
                     return false;
                 }
             }
         }
 
+        // check digest
+
+        if (decipher[3+paddingLen+digestAlgoWithParamLen] != 0x04
+            || decipher[4+paddingLen+digestAlgoWithParamLen] != 0x20) {
+            return false;
+        }
+
         for (uint i = 0;i<_sha256.length;i++) {
-            if (decipher[3+2+paddingLen+hashAlgoWithParamLen+i]!=_sha256[i]) {
+            if (decipher[5+paddingLen+digestAlgoWithParamLen+i]!=_sha256[i]) {
                 return false;
             }
         }
