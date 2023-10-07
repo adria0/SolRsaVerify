@@ -41,7 +41,7 @@ Now let's extract the public key from the private key:
 And finally we need to extract `n` (the modulus) from the public key:
 
 
-    $  openssl asn1parse -inform PEM -i -in public.pem -strparse 18
+    $  openssl asn1parse -inform DER -i -in public.pem -strparse 18
     0:d=0  hl=3 l= 137 cons: SEQUENCE
     3:d=1  hl=3 l= 129 prim:  INTEGER           :B793F2F926170FAD768F8B1A5769A2243B4CDCAC4780194F59B39E1A2ABC3BB8EA42DB495D17BEC7F7072A11ED4FA510E75A7886A5DB6F71B7AFCA0090CA079889D18AF0669829ED29A8E21D0C09BD19CAAF2FE2CC8121BFC5687AC6698E3022F468A481426486CAD263BE1A119491E034A6E1AB78F19C066D4145A50F9ECFF7
     135:d=1  hl=2 l=   3 prim:  INTEGER           :010001
