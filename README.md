@@ -34,7 +34,7 @@ convert from binary to hex and finally to `tr` to truncate newlines.
 Now let's extract the public key from the private key:
 
 
-    $ openssl rsa -in private.pem -outform der -pubout -out public.pem
+    $ openssl rsa -in private.pem -outform pem -pubout -out public.pem
     writing RSA key
 
 
