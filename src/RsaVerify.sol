@@ -24,17 +24,6 @@ pragma solidity ^0.8.0;
  */
 
 library RsaVerify {
-    uint256 constant sha256ExplicitNullParamByteLen = 17;
-    bytes32 constant sha256ExplicitNullParam =
-        0x3031300d06096086480165030402010500000000000000000000000000000000;
-    bytes32 constant sha256ExplicitNullParamMask =
-        0xffffffffffffffffffffffffffffffffff000000000000000000000000000000;
-
-    uint256 constant sha256ImplicitNullParamByteLen = 15;
-    bytes32 constant sha256ImplicitNullParam =
-        0x302f300b06096086480165030402010000000000000000000000000000000000;
-    bytes32 constant sha256ImplicitNullParamMask =
-        0xffffffffffffffffffffffffffffff0000000000000000000000000000000000;
 
     /** @dev Verifies a PKCSv1.5 SHA256 signature
       * @param _sha256 is the sha256 of the data
@@ -47,6 +36,15 @@ library RsaVerify {
         bytes32 _sha256,
         bytes memory _s, bytes memory _e, bytes memory _m
     ) public view returns (bool) {
+        
+        uint8[17] memory sha256ExplicitNullParam = [
+            0x30, 0x31, 0x30, 0x0d, 0x06, 0x09, 0x60, 0x86, 0x48, 0x01, 0x65, 0x03, 0x04, 0x02, 0x01, 0x05, 0x00
+        ];
+
+        uint8[15] memory sha256ImplicitNullParam = [
+            0x30,0x2f,0x30,0x0b,0x06,0x09,0x60,0x86,0x48,0x01,0x65,0x03,0x04,0x02,0x01
+        ];
+        
         // decipher
 
         bytes memory input = bytes.concat(
@@ -60,7 +58,7 @@ library RsaVerify {
         uint decipherlen = _m.length;
         bytes memory decipher = new bytes(decipherlen);
         assembly {
-            pop(staticcall(not(0), 0x5, add(input, 0x20), inputlen, add(decipher, 0x20), decipherlen))
+            pop(staticcall(sub(gas(), 2000), 5, add(input,0x20), inputlen, add(decipher,0x20), decipherlen))
 	    }
 
         // Check that is well encoded:
@@ -78,10 +76,10 @@ library RsaVerify {
 
         if (uint8(decipher[decipherlen-50])==0x31) {
             hasNullParam = true;
-            digestAlgoWithParamLen = sha256ExplicitNullParamByteLen;
+             digestAlgoWithParamLen = sha256ExplicitNullParam.length;
         } else if  (uint8(decipher[decipherlen-48])==0x2f) {
             hasNullParam = false;
-            digestAlgoWithParamLen = sha256ImplicitNullParamByteLen;
+            digestAlgoWithParamLen = sha256ImplicitNullParam.length;
         } else {
             return false;
         }
@@ -91,12 +89,9 @@ library RsaVerify {
         if (decipher[0] != 0 || decipher[1] != 0x01) {
             return false;
         }
-        for (uint i = 2; i <2 + paddingLen; ) {
+        for (uint i = 2;i<2+paddingLen;i++) {
             if (decipher[i] != 0xff) {
                 return false;
-            }
-            unchecked {
-                i++;
             }
         }
         if (decipher[2+paddingLen] != 0) {
@@ -104,50 +99,17 @@ library RsaVerify {
         }
 
         // check digest algorithm
-        if (digestAlgoWithParamLen == sha256ExplicitNullParamByteLen) {
-            assembly {
-                //
-                // Equivalent code:
-                //
-                //    for (uint i = 0; i < digestAlgoWithParamLen; i++) {
-                //        if (decipher[3 + paddingLen + i] != bytes1(sha256ExplicitNullParam[i])) {
-                //            return false;
-                //        }
-                //    }
-                //
 
-                // load decipher[3 + paddingLen + 0]
-                let _data := mload(add(add(add(decipher, 0x20), 3), paddingLen))
-                // ensure that only the first `sha256ImplicitNullParamByteLen` bytes have data
-                _data := and(_data, sha256ExplicitNullParamMask)
-                // check that the data is equal to `sha256ExplicitNullParam`
-                _data := xor(_data, sha256ExplicitNullParam)
-                if gt(_data, 0) {
-                    mstore(0x00, false)
-                    return(0x00, 0x20)
+        if (digestAlgoWithParamLen == sha256ExplicitNullParam.length) {
+            for (uint i = 0;i<digestAlgoWithParamLen;i++) {
+                if (decipher[3+paddingLen+i]!=bytes1(sha256ExplicitNullParam[i])) {
+                    return false;
                 }
             }
         } else {
-            assembly {
-                //
-                // Equivalent code:
-                //
-                //    for (uint i = 0; i < digestAlgoWithParamLen; i++) {
-                //        if (decipher[3 + paddingLen + i] != bytes1(sha256ImplicitNullParam[i])) {
-                //            return false;
-                //        }
-                //    }
-                //
-
-                // load decipher[3 + paddingLen + 0]
-                let _data := mload(add(add(add(decipher, 0x20), 3), paddingLen))
-                // ensure that only the first `sha256ImplicitNullParamByteLen` bytes have data 
-                _data := and(_data, sha256ImplicitNullParamMask)
-                // check that the data is equal to `sha256ImplicitNullParam`
-                _data := xor(_data, sha256ImplicitNullParam)
-                if gt(_data, 0) {
-                    mstore(0x00, false)
-                    return(0x00, 0x20)
+            for (uint i = 0;i<digestAlgoWithParamLen;i++) {
+                if (decipher[3+paddingLen+i]!=bytes1(sha256ImplicitNullParam[i])) {
+                    return false;
                 }
             }
         }
@@ -159,25 +121,9 @@ library RsaVerify {
             return false;
         }
 
-        assembly {
-
-            //
-            // Equivalent code:
-            //
-            //    for (uint i = 0;i<_sha256.length;i++) {
-            //        if (decipher[5+paddingLen+digestAlgoWithParamLen+i]!=_sha256[i]) {
-            //            return false;
-            //        }
-            //    }
-            //
-
-            // load decipher[5 + paddingLen + digestAlgoWithParamLen + 0]
-            let _data := mload(add(add(add(add(decipher, 0x20), 5), paddingLen),digestAlgoWithParamLen))
-            // check that the data is equal to `_sha256`
-            _data := xor(_data, _sha256)
-            if gt(_data, 0) {
-                mstore(0x00, false)
-                return(0x00, 0x20)
+        for (uint i = 0;i<_sha256.length;i++) {
+            if (decipher[5+paddingLen+digestAlgoWithParamLen+i]!=_sha256[i]) {
+                return false;
             }
         }
 
